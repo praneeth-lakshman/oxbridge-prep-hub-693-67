@@ -256,13 +256,18 @@ const Team = () => {
               style={{ color: 'white' }}
               onClick={async () => {
                 try {
-                  const { data: { user } } = await supabase.auth.getUser();
-                  if (!user) {
-                    // Redirect to login if not authenticated
+                  // Check if user is authenticated
+                  const { data: { user }, error: authError } = await supabase.auth.getUser();
+                  
+                  if (authError || !user) {
+                    console.log('User not authenticated, redirecting to login');
+                    // Redirect to login if not authenticated - user needs to be logged in
                     window.location.href = '/login';
                     return;
                   }
 
+                  console.log('User authenticated, creating payment session...');
+                  
                   const { data, error } = await supabase.functions.invoke('create-payment', {
                     body: {
                       tutorId: member.id,
@@ -273,12 +278,16 @@ const Team = () => {
 
                   if (error) {
                     console.error('Payment error:', error);
-                    alert('Failed to create payment session. Please try again.');
+                    alert(`Payment failed: ${error.message}`);
                     return;
                   }
 
                   if (data?.url) {
+                    console.log('Payment session created, opening Stripe checkout...');
                     window.open(data.url, '_blank');
+                  } else {
+                    console.error('No payment URL received');
+                    alert('Failed to create payment session. Please try again.');
                   }
                 } catch (error) {
                   console.error('Error:', error);

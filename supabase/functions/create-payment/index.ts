@@ -19,9 +19,17 @@ serve(async (req) => {
 
   try {
     logStep("Function started");
+    console.log("Full request details:", {
+      method: req.method,
+      headers: Object.fromEntries(req.headers.entries()),
+      url: req.url
+    });
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY is not set");
+      throw new Error("STRIPE_SECRET_KEY is not set");
+    }
     logStep("Stripe key verified");
 
     // Create Supabase client with service role key for database writes
@@ -33,7 +41,10 @@ serve(async (req) => {
 
     // Get authenticated user
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    if (!authHeader) {
+      logStep("ERROR: No authorization header provided");
+      throw new Error("No authorization header provided - user must be logged in");
+    }
     logStep("Authorization header found");
 
     const token = authHeader.replace("Bearer ", "");
@@ -45,9 +56,11 @@ serve(async (req) => {
 
     // Parse request body
     const body = await req.json();
+    logStep("Raw request body", body);
     const { tutorId, examType, lessonQuantity = 1 } = body;
     
     if (!tutorId || !examType) {
+      logStep("ERROR: Missing required parameters", { tutorId, examType });
       throw new Error("Missing required parameters: tutorId and examType");
     }
     logStep("Request data parsed", { tutorId, examType, lessonQuantity });
