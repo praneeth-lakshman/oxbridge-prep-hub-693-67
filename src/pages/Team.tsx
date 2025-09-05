@@ -252,17 +252,42 @@ const Team = () => {
             </Button>
             
             <Button 
-              asChild
               className="flex-1 text-white hover:text-white hover:scale-105 transition-transform duration-200"
               style={{ color: 'white' }}
+              onClick={async () => {
+                try {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (!user) {
+                    // Redirect to login if not authenticated
+                    window.location.href = '/login';
+                    return;
+                  }
+
+                  const { data, error } = await supabase.functions.invoke('create-payment', {
+                    body: {
+                      tutorId: member.id,
+                      examType: sectionId,
+                      lessonQuantity: 1
+                    }
+                  });
+
+                  if (error) {
+                    console.error('Payment error:', error);
+                    alert('Failed to create payment session. Please try again.');
+                    return;
+                  }
+
+                  if (data?.url) {
+                    window.open(data.url, '_blank');
+                  }
+                } catch (error) {
+                  console.error('Error:', error);
+                  alert('Something went wrong. Please try again.');
+                }
+              }}
             >
-              <Link 
-                to={`/team#${sectionId}`}
-                className="text-white hover:text-white no-underline"
-              >
-                <GraduationCap className="h-4 w-4 mr-2" />
-                Buy Lessons
-              </Link>
+              <GraduationCap className="h-4 w-4 mr-2" />
+              Buy Lessons
             </Button>
           </div>
           

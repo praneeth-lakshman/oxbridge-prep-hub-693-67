@@ -79,6 +79,48 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          exam_type: string
+          id: string
+          lesson_quantity: number | null
+          status: string | null
+          stripe_session_id: string | null
+          student_id: string
+          tutor_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          exam_type: string
+          id?: string
+          lesson_quantity?: number | null
+          status?: string | null
+          stripe_session_id?: string | null
+          student_id: string
+          tutor_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          exam_type?: string
+          id?: string
+          lesson_quantity?: number | null
+          status?: string | null
+          stripe_session_id?: string | null
+          student_id?: string
+          tutor_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
