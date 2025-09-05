@@ -9,6 +9,7 @@ try {
   logStep("API key test failed", keyError);
   throw new Error(`Invalid Stripe API key: ${keyError.message}`);
 }
+// hello
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
